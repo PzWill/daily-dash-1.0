@@ -1,52 +1,32 @@
-# Prerequisites
-*.d
+## --- .NET / Visual Studio ---
+[Bb]in/
+[Oo]bj/
+.vs/
+.vscode/
+*.user
+*.suo
+*.sln.docstates
+*.db-shm
+*.db-wal
 
-# Object files
-*.o
-*.ko
-*.obj
-*.elf
+## --- Node.js / Vite ---
+node_modules/
+dist/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Linker output
-*.ilk
-*.map
-*.exp
+## --- App Specific / Data ---
+backups/
+data/
+Publish/
 
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
-
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
-
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
+## --- OS Files ---
+.DS_Store
+Thumbs.db
+desktop.ini

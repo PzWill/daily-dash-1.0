@@ -1,4 +1,0 @@
-System.ArgumentOutOfRangeException: startIndex cannot be larger than length of string. (Parameter 'startIndex')
-   at System.String.ThrowSubstringArgumentOutOfRange(Int32 startIndex, Int32 length)
-   at System.String.Substring(Int32 startIndex)
-   at DailyDash.Services.MarkdownDataManager.LoadDailyStateAsync(DateTime date) in C:\Users\willi\Documents\antigravity projects\daily dash 2\Services\MarkdownDataManager.cs:line 106
