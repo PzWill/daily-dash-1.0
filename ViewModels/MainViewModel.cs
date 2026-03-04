@@ -69,6 +69,41 @@ namespace DailyDash.ViewModels
         [ObservableProperty]
         private bool isScratchpadExpanded;
 
+        // --- DASHBOARD UI STATE ---
+        [ObservableProperty]
+        private bool isLeftSidebarOpen = true;
+
+        [ObservableProperty]
+        private bool isRightSidebarOpen = true;
+
+        [ObservableProperty]
+        private bool isProjectsViewActive = false;
+
+        [ObservableProperty]
+        private bool isQuickIdeasActive = false;
+
+        [ObservableProperty]
+        private bool isMonthlyGoalsExpanded = true;
+
+        [ObservableProperty]
+        private bool isWeeklyGoalsExpanded = true;
+
+        [ObservableProperty]
+        private ObservableCollection<TaskItem> projectInbox = new();
+
+        [ObservableProperty]
+        private ObservableCollection<TaskItem> projectAnalyzing = new();
+
+        [ObservableProperty]
+        private ObservableCollection<TaskItem> projectSomeday = new();
+
+        [ObservableProperty]
+        private bool isProjectDetailMode = false;
+
+        [ObservableProperty]
+        private TaskItem? selectedProjectIdeaForDetails;
+
+
         [RelayCommand]
         private void NavigateToTaskDetail(TaskItem? task)
         {
@@ -103,10 +138,79 @@ namespace DailyDash.ViewModels
         }
 
         [RelayCommand]
+        private void NavigateToProjectIdeaDetail(TaskItem? idea)
+        {
+            if (idea != null)
+            {
+                SelectedProjectIdeaForDetails = idea;
+                
+                // Ensure at least one block exists if we use NoteBlocks, 
+                // but since Project Ideas use the milkdown editor via NotesMarkdown, we just need to set the flag.
+                IsProjectDetailMode = true;
+            }
+        }
+
+        [RelayCommand]
+        private void CloseProjectIdeaDetail()
+        {
+            SelectedProjectIdeaForDetails = null;
+            IsProjectDetailMode = false;
+            _ = SaveProjectIdeasAsync();
+        }
+
+        [RelayCommand]
         private void ToggleScratchpadExpanded()
         {
             IsScratchpadExpanded = !IsScratchpadExpanded;
         }
+
+        [RelayCommand]
+        private void AddProjectIdea(string listName)
+        {
+            var idea = new TaskItem("Nova Ideia");
+            idea.PropertyChanged += ProjectIdea_PropertyChanged;
+            
+            if (listName == "Inbox") ProjectInbox.Insert(0, idea);
+            else if (listName == "Analyzing") ProjectAnalyzing.Insert(0, idea);
+            else if (listName == "Someday") ProjectSomeday.Insert(0, idea);
+            
+            _ = SaveProjectIdeasAsync();
+        }
+
+        [RelayCommand]
+        private void RemoveProjectIdea(TaskItem? idea)
+        {
+            if (idea == null) return;
+            
+            idea.PropertyChanged -= ProjectIdea_PropertyChanged;
+            
+            if (ProjectInbox.Contains(idea)) ProjectInbox.Remove(idea);
+            else if (ProjectAnalyzing.Contains(idea)) ProjectAnalyzing.Remove(idea);
+            else if (ProjectSomeday.Contains(idea)) ProjectSomeday.Remove(idea);
+            
+            _ = SaveProjectIdeasAsync();
+        }
+
+        [RelayCommand]
+        private void ToggleLeftSidebar() => IsLeftSidebarOpen = !IsLeftSidebarOpen;
+
+        [RelayCommand]
+        private void ToggleRightSidebar() => IsRightSidebarOpen = !IsRightSidebarOpen;
+
+        [RelayCommand]
+        private void SetProjectsViewActive(string activeStr)
+        {
+            if (bool.TryParse(activeStr, out bool b)) IsProjectsViewActive = b;
+        }
+
+        [RelayCommand]
+        private void ToggleQuickIdeas() => IsQuickIdeasActive = !IsQuickIdeasActive;
+
+        [RelayCommand]
+        private void ToggleMonthlyGoals() => IsMonthlyGoalsExpanded = !IsMonthlyGoalsExpanded;
+
+        [RelayCommand]
+        private void ToggleWeeklyGoals() => IsWeeklyGoalsExpanded = !IsWeeklyGoalsExpanded;
 
         [RelayCommand]
         private void OpenTagMenu()
@@ -294,6 +398,12 @@ namespace DailyDash.ViewModels
                 if (!_isLoading) _ = SaveMonthlyGoalsAsync(); 
                 OnPropertyChanged(nameof(AllGoalsWithDeadlines));
             };
+            
+            // Note: Project ideas are tracked via their CollectionChanged to auto-save drag-and-drops
+            ProjectInbox.CollectionChanged += (s, e) => { if (!_isLoading) _ = SaveProjectIdeasAsync(); };
+            ProjectAnalyzing.CollectionChanged += (s, e) => { if (!_isLoading) _ = SaveProjectIdeasAsync(); };
+            ProjectSomeday.CollectionChanged += (s, e) => { if (!_isLoading) _ = SaveProjectIdeasAsync(); };
+
             _ = LoadTagsAsync().ContinueWith(t => {
                 if (SelectedTagItem == null && AvailableTags.Count > 0)
                 {
@@ -648,6 +758,9 @@ namespace DailyDash.ViewModels
         }
                 OnPropertyChanged(nameof(ProgressPercentage));
 
+                // Load Project Ideas
+                await LoadProjectIdeasAsync();
+
                 // Load Weekly Goals
                 await LoadWeeklyGoalsAsync();
                 // Load Monthly Goals
@@ -686,6 +799,85 @@ namespace DailyDash.ViewModels
             {
                 _isSaving = false;
             }
+        }
+
+        // ─── Project Ideas ──────────────────────────────────────────
+
+        private async Task LoadProjectIdeasAsync()
+        {
+            void Unsubscribe(ObservableCollection<TaskItem> list)
+            {
+                foreach (var g in list)
+                {
+                    g.PropertyChanged -= ProjectIdea_PropertyChanged;
+                    foreach (var sub in g.NoteBlocks.OfType<TaskItem>())
+                        sub.PropertyChanged -= ProjectIdeaSub_PropertyChanged;
+                }
+                list.Clear();
+            }
+            Unsubscribe(ProjectInbox);
+            Unsubscribe(ProjectAnalyzing);
+            Unsubscribe(ProjectSomeday);
+
+            var (inbox, analyzing, someday) = await MarkdownDataManager.LoadProjectIdeasAsync();
+
+            void Subscribe(IEnumerable<TaskItem> source, ObservableCollection<TaskItem> target)
+            {
+                foreach (var g in source)
+                {
+                    g.PropertyChanged += ProjectIdea_PropertyChanged;
+                    foreach (var sub in g.NoteBlocks.OfType<TaskItem>())
+                        sub.PropertyChanged += ProjectIdeaSub_PropertyChanged;
+                    target.Add(g);
+                }
+            }
+
+            Subscribe(inbox, ProjectInbox);
+            Subscribe(analyzing, ProjectAnalyzing);
+            Subscribe(someday, ProjectSomeday);
+        }
+
+        private bool _isSavingProjects;
+        private bool _saveProjectsPending;
+
+        private async Task SaveProjectIdeasAsync()
+        {
+            if (_isLoading) return;
+            if (_isSavingProjects)
+            {
+                _saveProjectsPending = true;
+                return;
+            }
+
+            _isSavingProjects = true;
+            try
+            {
+                do
+                {
+                    _saveProjectsPending = false;
+                    await MarkdownDataManager.SaveProjectIdeasAsync(ProjectInbox, ProjectAnalyzing, ProjectSomeday);
+                } while (_saveProjectsPending);
+            }
+            finally
+            {
+                _isSavingProjects = false;
+            }
+        }
+
+        private void ProjectIdea_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (_isLoading) return;
+            _ = SaveProjectIdeasAsync();
+        }
+
+        private void ProjectIdeaSub_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (_isLoading) return;
+            if (sender is TaskItem subtask && e.PropertyName == nameof(TaskItem.IsCompleted))
+            {
+                subtask.ParentTask?.UpdateCompletionPercent();
+            }
+            _ = SaveProjectIdeasAsync();
         }
 
         // ─── Weekly Goals ───────────────────────────────────────────

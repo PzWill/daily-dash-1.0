@@ -16,6 +16,9 @@ namespace DailyDash.Services
         private static readonly string DiasFolder    = Path.Combine(BaseFolder, "dias");
         private static readonly string SemanasFolder = Path.Combine(BaseFolder, "semanas");
         private static readonly string MesesFolder   = Path.Combine(BaseFolder, "meses");
+        private static readonly string ProjetosFolder = Path.Combine(BaseFolder, "projetos");
+
+        public static string GetProjectIdeasFilePath() => Path.Combine(ProjetosFolder, "project_ideas.json");
 
         public static string GetDailyFilePath(DateTime date)
         {
@@ -346,7 +349,165 @@ namespace DailyDash.Services
                 }
             }
             catch { }
+
             return history;
+        }
+
+        // ─── Project Ideas ──────────────────────────────────────────
+
+        public class ProjectIdeasDto
+        {
+            public List<TaskItem> Inbox { get; set; } = new();
+            public List<TaskItem> Analyzing { get; set; } = new();
+            public List<TaskItem> Someday { get; set; } = new();
+        }
+
+        public static async Task SaveProjectIdeasAsync(IEnumerable<TaskItem> inbox, IEnumerable<TaskItem> analyzing, IEnumerable<TaskItem> someday)
+        {
+            try
+            {
+                if (!Directory.Exists(ProjetosFolder)) Directory.CreateDirectory(ProjetosFolder);
+
+                var allIds = new HashSet<string>();
+
+                async Task SaveColumnAsync(IEnumerable<TaskItem> list, string columnName)
+                {
+                    foreach (var item in list)
+                    {
+                        var id = item.Id;
+                        if (string.IsNullOrEmpty(id)) { id = Guid.NewGuid().ToString("N"); item.Id = id; }
+                        allIds.Add(id);
+
+                        string filePath = Path.Combine(ProjetosFolder, $"{id}.md");
+                        using StreamWriter sw = new StreamWriter(filePath, false, System.Text.Encoding.UTF8);
+                        await sw.WriteLineAsync("---");
+                        await sw.WriteLineAsync($"id: {id}");
+                        await sw.WriteLineAsync($"title: {item.Title}");
+                        await sw.WriteLineAsync($"description: {item.Description}");
+                        await sw.WriteLineAsync($"column: {columnName}");
+                        await sw.WriteLineAsync($"tag: {item.Tag}");
+                        await sw.WriteLineAsync($"tagColor: {item.TagColor}");
+                        await sw.WriteLineAsync($"isCompleted: {item.IsCompleted}");
+                        await sw.WriteLineAsync($"linkedGoalId: {item.LinkedGoalId}");
+                        await sw.WriteLineAsync("---");
+                        await sw.WriteLineAsync();
+                        if (!string.IsNullOrEmpty(item.NotesMarkdown))
+                        {
+                            await sw.WriteLineAsync(item.NotesMarkdown);
+                        }
+                    }
+                }
+
+                await SaveColumnAsync(inbox, "Inbox");
+                await SaveColumnAsync(analyzing, "Analyzing");
+                await SaveColumnAsync(someday, "Someday");
+
+                // Delete obsolete files
+                var existingFiles = Directory.GetFiles(ProjetosFolder, "*.md");
+                foreach (var file in existingFiles)
+                {
+                    var id = Path.GetFileNameWithoutExtension(file);
+                    if (!allIds.Contains(id))
+                    {
+                        File.Delete(file);
+                    }
+                }
+            }
+            catch { }
+        }
+
+        public static async Task<(List<TaskItem> Inbox, List<TaskItem> Analyzing, List<TaskItem> Someday)> LoadProjectIdeasAsync()
+        {
+            var inbox = new List<TaskItem>();
+            var analyzing = new List<TaskItem>();
+            var someday = new List<TaskItem>();
+
+            if (!Directory.Exists(ProjetosFolder)) Directory.CreateDirectory(ProjetosFolder);
+
+            var mdFiles = Directory.GetFiles(ProjetosFolder, "*.md");
+
+            if (mdFiles.Length == 0)
+            {
+                // Fallback to JSON migration if present
+                var jsonPath = GetProjectIdeasFilePath();
+                if (File.Exists(jsonPath))
+                {
+                    try
+                    {
+                        using var fs = new FileStream(jsonPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        var options = new JsonSerializerOptions { ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles };
+                        var dto = await JsonSerializer.DeserializeAsync<ProjectIdeasDto>(fs, options);
+                        if (dto != null)
+                        {
+                            void Reattach(List<TaskItem> list)
+                            {
+                                foreach (var g in list)
+                                {
+                                    foreach (var sub in g.NoteBlocks.OfType<TaskItem>())
+                                        sub.ParentTask = g;
+                                }
+                            }
+                            Reattach(dto.Inbox);
+                            Reattach(dto.Analyzing);
+                            Reattach(dto.Someday);
+                            return (dto.Inbox, dto.Analyzing, dto.Someday);
+                        }
+                    }
+                    catch { }
+                }
+                return (inbox, analyzing, someday);
+            }
+
+            try
+            {
+                foreach (var file in mdFiles)
+                {
+                    var lines = await File.ReadAllLinesAsync(file, System.Text.Encoding.UTF8);
+                    
+                    var task = new TaskItem { Id = Path.GetFileNameWithoutExtension(file) };
+                    string column = "Inbox";
+                    
+                    int i = 0;
+                    if (lines.Length > 0 && lines[0] == "---")
+                    {
+                        i = 1;
+                        for (; i < lines.Length; i++)
+                        {
+                            if (lines[i] == "---") { i++; break; }
+                            var parts = lines[i].Split(new[] { ':' }, 2);
+                            if (parts.Length == 2)
+                            {
+                                var key = parts[0].Trim();
+                                var val = parts[1].Trim();
+                                switch (key)
+                                {
+                                    case "title": task.Title = val; break;
+                                    case "description": task.Description = val; break;
+                                    case "column": column = val; break;
+                                    case "tag": task.Tag = val; break;
+                                    case "tagColor": task.TagColor = val; break;
+                                    case "isCompleted": if(bool.TryParse(val, out bool b)) task.IsCompleted = b; break;
+                                    case "linkedGoalId": task.LinkedGoalId = val; break;
+                                }
+                            }
+                        }
+                    }
+                    
+                    var mdBody = new System.Text.StringBuilder();
+                    for (; i < lines.Length; i++)
+                    {
+                        mdBody.AppendLine(lines[i]);
+                    }
+                    task.NotesMarkdown = mdBody.ToString().Trim();
+
+                    if (column == "Analyzing") analyzing.Add(task);
+                    else if (column == "Someday") someday.Add(task);
+                    else inbox.Add(task);
+                }
+            }
+            catch { }
+
+            return (inbox, analyzing, someday);
         }
     }
 }

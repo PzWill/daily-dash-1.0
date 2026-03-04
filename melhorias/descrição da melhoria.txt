@@ -1,0 +1,31 @@
+Aqui está o resumo detalhado de todas as mudanças visuais e funcionais que apliquei em relação ao design original (da primeira imagem) para chegar a este resultado atual:
+
+1. Dinâmica Global da Tela (Layout Fluido)
+
+Barras Laterais Retráteis: Transformei tanto a barra da esquerda quanto a da direita em painéis retráteis (tipo porta de correr). Agora elas podem ser ocultadas para dar foco total à área central.
+
+Controles de Janela (Topo Direito): Movi os botões de minimizar, maximizar e fechar para uma camada global fixa no canto superior direito. Assim, mesmo se você fechar a barra lateral direita, os botões continuam visíveis e no lugar correto.
+
+2. Área Central (Main Content)
+
+Navegação por Abas (Tabs): Adicionei um cabeçalho sutil no topo com as opções Visão Diária e Projetos 5. Isso permite trocar o contexto da tela principal sem perder a essência de "Dashboard de Tela Única".
+
+Botões de Controle dos Painéis: Adicionei ícones nas extremidades deste novo cabeçalho (PanelLeft e PanelRight) que servem como gatilhos para abrir e fechar as barras laterais.
+
+Nova Tela de Kanban (Projetos): Quando a aba "Projetos" é selecionada, a interface do dia a dia é substituída por um quadro Kanban limpo, dividido em colunas como "Caixa de Entrada", "Analisando" e "Talvez um Dia", com cards de ideias coloridos por tags.
+
+Atalho Rápido (Lâmpada 💡): Adicionei um ícone de lâmpada no cabeçalho central. Ele serve para alternar o conteúdo da barra lateral direita rapidamente.
+
+3. Barra Lateral Esquerda
+
+Metas Mensais Retráteis: Adicionei um ícone de seta (Chevron) ao lado do título "Metas Mensais". A área agora funciona como um "acordeão", permitindo que você clique no título para esconder ou mostrar as metas, economizando espaço.
+
+Novo Botão no Rodapé: Incluí o botão 📂 Projetos & Ideias no menu inferior, logo acima de "Configurações" e "Insights", servindo como uma rota alternativa para acessar o Kanban de ideias.
+
+4. Barra Lateral Direita
+
+Metas Semanais Retráteis: Assim como na esquerda, o título "Metas Semanais" ganhou uma seta e agora pode ser recolhido/expandido ao clicar.
+
+Dupla Personalidade (Ideias Rápidas): Graças ao botão da Lâmpada (💡), esta barra agora tem duas "caras". A cara original (Metas Semanais + Gráfico de Contribuições) e uma nova cara chamada "Ideias Rápidas", que funciona como uma lista vertical de backlog, projetada visualmente para que o usuário possa "arrastar" ideias dali direto para o Foco do Dia.
+
+Em resumo: o design original, que era estático, foi transformado em um dashboard altamente modular. Você pode focar só no "hoje" fechando tudo, ou abrir seu planejamento de longo prazo sem sair da mesma janela.
