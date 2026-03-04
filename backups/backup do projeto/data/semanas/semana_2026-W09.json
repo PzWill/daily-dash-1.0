@@ -1,0 +1,18 @@
+[
+  {
+    "Title": "teste de semana",
+    "LinkedGoalId": "7b09bf035f054de982efdbc4588d97b1",
+    "Notes": "",
+    "NoteBlocks": [],
+    "InlineTasks": [],
+    "Description": "",
+    "IsCompleted": false,
+    "Tag": "teste",
+    "TagColor": "#FF2D55",
+    "CompletionPercent": 0,
+    "Deadline": "2026-03-01T00:00:00",
+    "ParentTask": null,
+    "IsFocused": false,
+    "Id": "986e1fe77942496891b1eb3a9263ecd3"
+  }
+]

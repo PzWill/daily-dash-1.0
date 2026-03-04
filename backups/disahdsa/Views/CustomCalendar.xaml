@@ -1,0 +1,57 @@
+<UserControl x:Class="DailyDash.Views.CustomCalendar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Header: nav arrows + month/year -->
+            <RowDefinition Height="Auto"/>
+            <!-- Day-of-week labels -->
+            <RowDefinition Height="Auto"/>
+            <!-- Day grid (6 rows max) -->
+            <RowDefinition Height="Auto"/>
+            <!-- Deadlines List for selected day -->
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="◀" Click="PrevMonth_Click"
+                    Foreground="White" Background="Transparent" BorderThickness="0"
+                    FontSize="14" Cursor="Hand" Padding="8,4" VerticalAlignment="Center"/>
+            <TextBlock x:Name="MonthYearText" Grid.Column="1" 
+                       Foreground="White" FontSize="16" FontWeight="SemiBold"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Button Grid.Column="2" Content="▶" Click="NextMonth_Click"
+                    Foreground="White" Background="Transparent" BorderThickness="0"
+                    FontSize="14" Cursor="Hand" Padding="8,4" VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- Day-of-week headers -->
+        <UniformGrid x:Name="DayOfWeekRow" Grid.Row="1" Rows="1" Columns="7" Margin="0,0,0,6"/>
+
+        <!-- Day buttons grid -->
+        <UniformGrid x:Name="DaysGrid" Grid.Row="2" Rows="6" Columns="7"/>
+        
+        <!-- Deadlines for Selected Date -->
+        <ScrollViewer Grid.Row="3" Margin="0,15,0,0" VerticalScrollBarVisibility="Auto">
+            <ItemsControl x:Name="SelectedDayDeadlinesList">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="0,3">
+                            <Border Width="8" Height="8" CornerRadius="4" 
+                                    Background="{Binding TagColorBrush}"
+                                    VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding Title}" Foreground="White" FontSize="12" 
+                                       TextWrapping="Wrap" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

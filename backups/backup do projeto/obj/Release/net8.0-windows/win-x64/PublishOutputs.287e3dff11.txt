@@ -1,0 +1,6 @@
+C:\Users\willi\Documents\antigravity projects\daily dash 2\bin\Release\net8.0-windows\win-x64\publish\DailyDash.exe
+C:\Users\willi\Documents\antigravity projects\daily dash 2\bin\Release\net8.0-windows\win-x64\publish\DailyDash.dll
+C:\Users\willi\Documents\antigravity projects\daily dash 2\bin\Release\net8.0-windows\win-x64\publish\DailyDash.deps.json
+C:\Users\willi\Documents\antigravity projects\daily dash 2\bin\Release\net8.0-windows\win-x64\publish\DailyDash.runtimeconfig.json
+C:\Users\willi\Documents\antigravity projects\daily dash 2\bin\Release\net8.0-windows\win-x64\publish\DailyDash.pdb
+C:\Users\willi\Documents\antigravity projects\daily dash 2\bin\Release\net8.0-windows\win-x64\publish\CommunityToolkit.Mvvm.dll

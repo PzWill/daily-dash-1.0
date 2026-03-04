@@ -1,0 +1,60 @@
+:root {
+    --crepe-color-background: transparent;
+    --crepe-color-surface: transparent;
+    --crepe-color-on-background: #EEEEEE;
+    --crepe-color-on-surface: #EEEEEE;
+    --crepe-color-primary: #007AFF;
+    --crepe-color-secondary: #005bb5;
+    --crepe-color-border: #30FFFFFF;
+    --crepe-color-outline: #30FFFFFF;
+    --crepe-color-shadow: rgba(0, 0, 0, 0.5);
+    --crepe-color-hover: rgba(255, 255, 255, 0.05);
+    color-scheme: dark;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: transparent !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: white;
+    overflow: hidden;
+    /* Milkdown usually scrolls internally */
+}
+
+#app {
+    height: 100vh;
+    overflow-y: auto;
+    /* Provide a padding inside if needed, though crepe might handle it */
+    padding: 10px 20px;
+    background-color: transparent !important;
+}
+
+/* Force milkdown/crepe editor backgrounds to be fully transparent */
+.milkdown,
+.crepe-root,
+.cm-editor,
+.milkdown-theme-crepe {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+
+/* Optional: customizing scrollbar to look good on dark theme */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}

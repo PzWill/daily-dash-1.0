@@ -1,0 +1,83 @@
+:root {
+    --crepe-color-background: transparent;
+    --crepe-color-surface: transparent;
+    --crepe-color-on-background: #EEEEEE;
+    --crepe-color-on-surface: #EEEEEE;
+    --crepe-color-primary: #007AFF;
+    --crepe-color-secondary: #005bb5;
+    --crepe-color-border: #30FFFFFF;
+    --crepe-color-outline: #30FFFFFF;
+    --crepe-color-shadow: rgba(0, 0, 0, 0.5);
+    --crepe-color-hover: rgba(255, 255, 255, 0.05);
+    color-scheme: dark;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: transparent !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: white;
+    overflow: hidden;
+    /* Milkdown usually scrolls internally */
+}
+
+#app {
+    height: 100vh;
+    overflow-y: auto;
+    /* Added left padding specifically to fit the block menu (+ and 6 dots) */
+    padding: 0px 5px 0px 50px;
+    background-color: transparent !important;
+}
+
+/* Force milkdown/crepe editor backgrounds to be fully transparent, take full width */
+.milkdown,
+.crepe-root,
+.cm-editor,
+.milkdown-theme-crepe {
+    background-color: transparent !important;
+    background: transparent !important;
+    max-width: 100% !important;
+    /* Crepe uses its own paddings and positioning for the menu, so don't override them with 0 */
+}
+
+/* Remove default ProseMirror paddings that make it poorly positioned */
+.ProseMirror {
+    padding: 5px 0px !important;
+    margin: 0 !important;
+    min-height: 100%;
+}
+
+/* Add blue selection effect */
+::selection {
+    background: rgba(0, 122, 255, 0.4) !important;
+    color: inherit;
+}
+
+.ProseMirror ::selection {
+    background: rgba(0, 122, 255, 0.4) !important;
+}
+
+.ProseMirror *::selection {
+    background: rgba(0, 122, 255, 0.4) !important;
+}
+
+/* Optional: customizing scrollbar to look good on dark theme */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}

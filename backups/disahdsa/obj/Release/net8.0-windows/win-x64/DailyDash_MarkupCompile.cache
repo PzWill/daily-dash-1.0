@@ -1,0 +1,20 @@
+﻿DailyDash
+
+
+winexe
+C#
+.cs
+c:\Users\willi\Documents\antigravity projects\daily dash 2\obj\Release\net8.0-windows\win-x64\
+DailyDash
+none
+false
+TRACE;RELEASE;NET;NET8_0;NETCOREAPP
+c:\Users\willi\Documents\antigravity projects\daily dash 2\App.xaml
+71518274995
+180-998193281
+251385556493
+213-990646826
+Controls\ImageWidget.xaml;Controls\NotepadEditor.xaml;Themes\Generic.xaml;Views\CustomCalendar.xaml;Views\InsightsView.xaml;Views\MainWindow.xaml;Views\SettingsWindow.xaml;
+
+False
+

@@ -1,0 +1,14 @@
+{
+  "DailyFocus": "",
+  "ScratchpadText": "dsadsad",
+  "Tasks": [
+    {
+      "Title": "Implementar ViewModels",
+      "IsCompleted": false
+    },
+    {
+      "Title": "Design no Figma",
+      "IsCompleted": true
+    }
+  ]
+}

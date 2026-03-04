@@ -1,0 +1,22 @@
+<UserControl x:Class="DailyDash.Controls.ImageWidget"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:DailyDash.Controls">
+    <Grid Margin="0,5,0,5" x:Name="RootGrid" MouseEnter="RootGrid_MouseEnter" MouseLeave="RootGrid_MouseLeave">
+        <Image x:Name="MainImage" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center" />
+        
+        <!-- Controls Overlay -->
+        <Border x:Name="ControlsOverlay" Background="#90000000" CornerRadius="4" 
+                Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,4,0,0" Padding="8,4">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Tamanho:" Foreground="White" FontSize="10" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                <Slider x:Name="SizeSlider" Minimum="100" Maximum="1000" Value="350" Width="80" VerticalAlignment="Center"
+                        ValueChanged="SizeSlider_ValueChanged" Focusable="False" LargeChange="100" SmallChange="10"/>
+                <Border Width="1" Background="#40FFFFFF" Margin="8,0" Height="14"/>
+                <Button Content="Esq" FontSize="10" Padding="4,2" Margin="0,0,4,0" Background="#30FFFFFF" BorderThickness="0" Foreground="White" Cursor="Hand" Focusable="False" Click="AlignLeft_Click"/>
+                <Button Content="Cen" FontSize="10" Padding="4,2" Margin="0,0,4,0" Background="#30FFFFFF" BorderThickness="0" Foreground="White" Cursor="Hand" Focusable="False" Click="AlignCenter_Click"/>
+                <Button Content="Dir" FontSize="10" Padding="4,2" Margin="0,0,0,0" Background="#30FFFFFF" BorderThickness="0" Foreground="White" Cursor="Hand" Focusable="False" Click="AlignRight_Click"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
